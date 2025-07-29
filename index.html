@@ -20,6 +20,7 @@
                 <p>Teste dein Wissen über Künstliche Intelligenz</p>
             </header>
             <nav class="main-menu">
+                <button id="master-quiz-btn"><i class="fas fa-star"></i> MASTER Quiz</button>
                 <button data-target="category-selection-screen"><i class="fas fa-list-ul"></i> Kategorien</button>
                 <button data-target="incorrect-list-screen"><i class="fas fa-redo"></i> Falsch beantwortet</button>
                 <button data-target="exam-screen" id="exam-button"><i class="fas fa-graduation-cap"></i> Prüfung</button>
@@ -47,8 +48,10 @@
         <!-- ===== Quiz Screen ===== -->
         <section id="quiz-screen" class="screen">
             <header class="screen-header">
-                 <button class="back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i></button>
+                 <button class="back-button" id="quiz-back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2 id="quiz-category-title">Kategorie</h2>
+                <!-- NEU: Joker Container -->
+                <div id="joker-container"></div>
             </header>
             <div id="quiz-container">
                 <div id="quiz-progress-bar">
@@ -90,6 +93,7 @@
                 <div id="exam-question-card">
                     <p id="exam-question-text"></p>
                 </div>
+                <!-- NEU: Textarea mit Mic-Button -->
                 <div id="exam-answer-area">
                     <textarea id="exam-answer-input" placeholder="Tippe oder sprich deine Antwort hier..."></textarea>
                     <button id="mic-button"><i class="fas fa-microphone"></i></button>
