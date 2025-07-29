@@ -32,12 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const screens = document.querySelectorAll('.screen');
     const app = document.getElementById('app');
     const globalProgressElements = document.querySelectorAll('.global-progress');
-
-    // Main Menu
     const examButton = document.getElementById('exam-button');
     const masterQuizBtn = document.getElementById('master-quiz-btn');
-
-    // Quiz Screen
+    const categoryList = document.getElementById('category-list');
     const quizCategoryTitle = document.getElementById('quiz-category-title');
     const quizCounter = document.getElementById('quiz-counter');
     const questionText = document.getElementById('question-text');
@@ -48,11 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const quizProgressBarInner = document.getElementById('quiz-progress-bar-inner');
     const jokerContainer = document.getElementById('joker-container');
     const quizBackButton = document.getElementById('quiz-back-button');
-
-    // Incorrect List Screen
     const incorrectQuestionsList = document.getElementById('incorrect-questions-list');
-
-    // Exam Screen
     const examContainer = document.getElementById('exam-container');
     const examCounter = document.getElementById('exam-counter');
     const examQuestionText = document.getElementById('exam-question-text');
@@ -67,8 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const examCompletionScreen = document.getElementById('exam-completion-screen');
     const examFinalScore = document.getElementById('exam-final-score');
     const restartExamBtn = document.getElementById('restart-exam-btn');
-
-    // Settings
     const resetProgressBtn = document.getElementById('reset-progress-btn');
 
     // --- INITIALIZATION ---
@@ -79,6 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('questions.json'),
                 fetch('test.json')
             ]);
+            // Wichtig: Prüfen ob die Antwort erfolgreich war (Status 200)
+            if (!questionsRes.ok || !testRes.ok) {
+                throw new Error(`HTTP error! Status: ${questionsRes.status}, ${testRes.status}`);
+            }
             state.allQuestions = await questionsRes.json();
             state.testQuestions = await testRes.json();
             
@@ -90,7 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Fehler beim Laden der Quizdaten:", error);
-            app.innerHTML = `<p style="color:red; text-align:center; padding: 20px;">Fehler: Die Quizdaten (questions.json / test.json) konnten nicht geladen werden.</p>`;
+            app.innerHTML = `<div style="padding: 25px; text-align: center;">
+                <h2 style="color: #dc3545;">Fehler beim Laden</h2>
+                <p style="color: #e0e0e0; margin-top: 10px;">Die Quizdaten (questions.json / test.json) konnten nicht geladen werden. Bitte stelle sicher, dass die Dateien im Hauptverzeichnis deines GitHub-Repositorys liegen und die Dateinamen korrekt sind.</p>
+                <p style="color: #a0a0a0; font-size: 0.8rem; margin-top: 15px;">Öffne die Entwicklerkonsole (F12) für mehr Details.</p>
+            </div>`;
         }
     }
 
@@ -158,13 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedProgress = localStorage.getItem('kiQuizProgress');
         if (savedProgress) {
             const parsed = JSON.parse(savedProgress);
-            // Sicherstellen, dass alle Felder vorhanden sind
             state.progress = {
-                correctlyAnswered: [],
-                incorrectlyAnswered: [],
-                consecutiveCorrect: 0,
-                jokers: 0,
-                ...parsed
+                correctlyAnswered: [], incorrectlyAnswered: [], consecutiveCorrect: 0, jokers: 0, ...parsed
             };
         }
     }
@@ -179,8 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateExamButtonState() {
-        // const allAnsweredCorrectly = state.allQuestions.length > 0 && state.progress.correctlyAnswered.length === state.allQuestions.length;
-        // examButton.disabled = !allAnsweredCorrectly;
         examButton.disabled = false; // Für Testzwecke immer aktiv
     }
 
@@ -194,53 +186,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- JOKER LOGIC ---
     function updateJokerDisplay() {
         jokerContainer.innerHTML = `
-            <span id="joker-count">${state.progress.jokers} <i class="fa-solid fa-lightbulb"></i></span>
-            <button id="use-joker-btn" title="50/50 Joker einsetzen" ${state.progress.jokers > 0 ? '' : 'disabled'}>
-                50/50
+            <span id="joker-count">${state.progress.jokers}</span>
+            <button id="use-joker-btn" title="50/50 Joker" ${state.progress.jokers > 0 ? '' : 'disabled'}>
+                <i class="fas fa-lightbulb"></i> 50/50
             </button>
         `;
     }
 
     function useJoker() {
         if (state.progress.jokers <= 0) return;
-
         state.progress.jokers--;
         const question = state.currentQuiz.questions[state.currentQuiz.index];
         const options = Array.from(optionsContainer.children);
-        const correctOptionKey = question.correct;
-        
-        const incorrectOptions = options.filter(opt => opt.dataset.option !== correctOptionKey);
-        incorrectOptions.sort(() => Math.random() - 0.5); // Mischen
-        
-        // Zwei falsche Optionen ausblenden
+        const incorrectOptions = options.filter(opt => opt.dataset.option !== question.correct);
+        incorrectOptions.sort(() => Math.random() - 0.5);
         incorrectOptions[0].classList.add('hidden');
         incorrectOptions[1].classList.add('hidden');
-        
-        const jokerButton = document.getElementById('use-joker-btn');
-        if (jokerButton) jokerButton.disabled = true;
-
+        document.getElementById('use-joker-btn').disabled = true;
         updateJokerDisplay();
         saveProgress();
     }
-
 
     // --- QUIZ LOGIC ---
     function startMasterQuiz() {
         const answeredIds = [...state.progress.correctlyAnswered, ...state.progress.incorrectlyAnswered];
         let masterQuestions = state.allQuestions.filter(q => !answeredIds.includes(q.id));
-        masterQuestions.sort(() => 0.5 - Math.random()); // Mischen
-
+        masterQuestions.sort(() => 0.5 - Math.random());
         if (masterQuestions.length === 0) {
             alert("Glückwunsch! Du hast bereits alle Fragen im Quiz beantwortet.");
             return;
         }
-
-        state.currentQuiz = {
-            questions: masterQuestions,
-            index: 0,
-            isMasterQuiz: true
-        };
-
+        state.currentQuiz = { questions: masterQuestions.slice(0, 10), index: 0, isMasterQuiz: true }; // Nimm 10 zufällige
         quizCategoryTitle.textContent = "MASTER Quiz";
         quizBackButton.dataset.target = "start-screen";
         showScreen('quiz-screen');
@@ -249,21 +225,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startQuiz(category) {
         const answeredIds = [...state.progress.correctlyAnswered, ...state.progress.incorrectlyAnswered];
-        const categoryQuestions = state.allQuestions.filter(q => 
-            q.category === category && !answeredIds.includes(q.id)
-        );
-        
+        const categoryQuestions = state.allQuestions.filter(q => q.category === category && !answeredIds.includes(q.id));
         if (categoryQuestions.length === 0) {
             alert(`Du hast bereits alle Fragen in der Kategorie "${category}" beantwortet.`);
             return;
         }
-
-        state.currentQuiz = {
-            questions: categoryQuestions,
-            index: 0,
-            isMasterQuiz: false
-        };
-
+        state.currentQuiz = { questions: categoryQuestions, index: 0, isMasterQuiz: false };
         quizCategoryTitle.textContent = category;
         quizBackButton.dataset.target = "category-selection-screen";
         showScreen('quiz-screen');
@@ -279,58 +246,43 @@ document.addEventListener('DOMContentLoaded', () => {
             showScreen(state.currentQuiz.isMasterQuiz ? 'start-screen' : 'category-selection-screen');
             return;
         }
-
         updateJokerDisplay();
         const question = state.currentQuiz.questions[state.currentQuiz.index];
         const progress = state.currentQuiz.index + 1;
         const total = state.currentQuiz.questions.length;
-
         quizCounter.textContent = `Frage ${progress} / ${total}`;
         quizProgressBarInner.style.width = `${(progress / total) * 100}%`;
         questionText.textContent = question.question;
-
         optionsContainer.innerHTML = '';
         Object.entries(question.options).forEach(([key, value]) => {
-            const button = document.createElement('button');
-            button.className = 'option-btn';
-            button.dataset.option = key;
-            button.innerHTML = `<strong>${key}</strong> ${value}`;
-            optionsContainer.appendChild(button);
+            optionsContainer.innerHTML += `<button class="option-btn" data-option="${key}"><strong>${key}</strong> ${value}</button>`;
         });
     }
     
     function handleAnswerSelection(selectedOption) {
         const question = state.currentQuiz.questions[state.currentQuiz.index];
         const isCorrect = selectedOption === question.correct;
-
         Array.from(optionsContainer.children).forEach(btn => {
             btn.classList.add('disabled');
             if (btn.dataset.option === question.correct) btn.classList.add('correct');
             else if (btn.dataset.option === selectedOption) btn.classList.add('incorrect');
         });
-        
         const questionId = question.id;
-        // Sicherstellen, dass die ID nicht doppelt vorkommt
         state.progress.correctlyAnswered = state.progress.correctlyAnswered.filter(id => id !== questionId);
         state.progress.incorrectlyAnswered = state.progress.incorrectlyAnswered.filter(id => id !== questionId);
-        
         if (isCorrect) {
             state.progress.correctlyAnswered.push(questionId);
             state.progress.consecutiveCorrect++;
             if (state.progress.consecutiveCorrect === 3) {
-                if (state.progress.jokers < 3) {
-                    state.progress.jokers++;
-                }
-                state.progress.consecutiveCorrect = 0; // Reset after earning
+                if (state.progress.jokers < 3) state.progress.jokers++;
+                state.progress.consecutiveCorrect = 0;
             }
         } else {
             state.progress.incorrectlyAnswered.push(questionId);
-            state.progress.consecutiveCorrect = 0; // Reset on incorrect
+            state.progress.consecutiveCorrect = 0;
         }
-        
         saveProgress();
         updateGlobalProgressDisplay();
-        
         explanationText.textContent = question.explanation;
         explanationContainer.classList.remove('hidden');
     }
@@ -340,49 +292,44 @@ document.addEventListener('DOMContentLoaded', () => {
         displayQuestion();
     }
     
-    function renderIncorrectList() { /*...*/ }
-    function retryIncorrectQuestion(questionId) { /*...*/ }
+    // --- INCORRECT LIST LOGIC (WIEDERHERGESTELLT) ---
+    function renderIncorrectList() {
+        incorrectQuestionsList.innerHTML = '';
+        const incorrectQuestions = state.allQuestions.filter(q => state.progress.incorrectlyAnswered.includes(q.id));
+        if (incorrectQuestions.length === 0) {
+            incorrectQuestionsList.innerHTML = '<p>Super! Du hast bisher alle Fragen richtig beantwortet.</p>';
+            return;
+        }
+        incorrectQuestions.forEach(q => {
+            const item = document.createElement('div');
+            item.className = 'incorrect-question-item';
+            item.innerHTML = `<p>${q.question}</p><button class="retry-btn" data-id="${q.id}">Wiederholen</button>`;
+            incorrectQuestionsList.appendChild(item);
+        });
+    }
+
+    function retryIncorrectQuestion(questionId) {
+        const questionToRetry = state.allQuestions.find(q => q.id === questionId);
+        if (questionToRetry) {
+            state.currentQuiz = { questions: [questionToRetry], index: 0, isMasterQuiz: false };
+            quizCategoryTitle.textContent = "Frage wiederholen";
+            quizBackButton.dataset.target = "incorrect-list-screen";
+            showScreen('quiz-screen');
+            displayQuestion();
+        }
+    }
 
     // --- EXAM LOGIC ---
-    function startExam() {
-        state.currentExam = {
-            questions: [...state.testQuestions].sort(() => 0.5 - Math.random()),
-            index: 0,
-            score: 0
-        };
-        examContainer.classList.remove('hidden');
-        examCompletionScreen.classList.add('hidden');
-        submitExamAnswerBtn.classList.remove('hidden');
-        examAnswerInput.value = '';
-        displayExamQuestion();
-        showScreen('exam-screen');
-    }
-
-    function displayExamQuestion() {
-        const question = state.currentExam.questions[state.currentExam.index];
-        const total = state.currentExam.questions.length;
-        examCounter.textContent = `Frage ${state.currentExam.index + 1} / ${total} | Richtig: ${state.currentExam.score}`;
-        examQuestionText.textContent = question.question;
-        examAnswerInput.value = '';
-        examAnswerInput.disabled = false;
-        micButton.disabled = false;
-        submitExamAnswerBtn.disabled = false;
-        examLoadingSpinner.classList.add('hidden');
-        examFeedbackCard.classList.add('hidden');
-    }
-
+    function startExam() { /* ... unverändert ... */ }
+    function displayExamQuestion() { /* ... unverändert ... */ }
     async function submitExamAnswer() {
         const question = state.currentExam.questions[state.currentExam.index];
         const answer = examAnswerInput.value.trim();
-        if (!answer) {
-            alert("Bitte gib eine Antwort ein.");
-            return;
-        }
+        if (!answer) { alert("Bitte gib eine Antwort ein."); return; }
         examLoadingSpinner.classList.remove('hidden');
         submitExamAnswerBtn.disabled = true;
         examAnswerInput.disabled = true;
         micButton.disabled = true;
-
         try {
             const response = await fetch(state.webhookUrl, {
                 method: 'POST',
@@ -390,23 +337,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ question: question.question, answer: answer })
             });
             if (!response.ok) throw new Error(`Webhook error: ${response.statusText}`);
-            
-            // NEU: Antwort als JSON parsen
             const data = await response.json();
-            const feedback = data[0]?.output || "Fehler: Unerwartetes Format vom Server erhalten.";
+            const feedback = data[0]?.output || "Fehler: Unerwartetes Format vom Server.";
             displayExamFeedback(feedback);
-
         } catch (error) {
             console.error("Fehler bei der Kommunikation mit dem Webhook:", error);
-            displayExamFeedback("Fehler: Die Antwort konnte nicht ausgewertet werden. Bitte versuche es später erneut.");
+            displayExamFeedback("Fehler: Die Antwort konnte nicht ausgewertet werden.");
         } finally {
             examLoadingSpinner.classList.add('hidden');
         }
     }
+    function displayExamFeedback(feedback) { /* ... unverändert ... */ }
+    function showNextExamQuestion() { /* ... unverändert ... */ }
     
+    // --- SPEECH RECOGNITION ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    function initSpeechRecognition() { /* ... unverändert ... */ }
+    function toggleSpeechRecognition() { /* ... unverändert ... */ }
+
+    // Unveränderte Funktionen hier zur Vollständigkeit
+    function startExam() {
+        state.currentExam = { questions: [...state.testQuestions].sort(() => 0.5 - Math.random()), index: 0, score: 0 };
+        examContainer.classList.remove('hidden'); examCompletionScreen.classList.add('hidden');
+        submitExamAnswerBtn.classList.remove('hidden'); examAnswerInput.value = '';
+        displayExamQuestion(); showScreen('exam-screen');
+    }
+    function displayExamQuestion() {
+        const question = state.currentExam.questions[state.currentExam.index];
+        examCounter.textContent = `Frage ${state.currentExam.index + 1} / ${state.currentExam.questions.length} | Richtig: ${state.currentExam.score}`;
+        examQuestionText.textContent = question.question;
+        examAnswerInput.value = ''; examAnswerInput.disabled = false; micButton.disabled = false; submitExamAnswerBtn.disabled = false;
+        examLoadingSpinner.classList.add('hidden'); examFeedbackCard.classList.add('hidden');
+    }
     function displayExamFeedback(feedback) {
         const firstWord = feedback.split(' ')[0].toLowerCase().replace(/[^a-zäöüß]/gi, '');
-        
         if (firstWord === 'richtig') {
             state.currentExam.score++;
             examFeedbackCard.className = 'exam-feedback-card correct';
@@ -415,68 +380,36 @@ document.addEventListener('DOMContentLoaded', () => {
             examFeedbackCard.className = 'exam-feedback-card check';
             feedbackTitle.textContent = "Antwort-Check";
         }
-        
-        // \n mit <br> ersetzen für die Anzeige im HTML
-        const formattedFeedback = feedback.replace(/\n/g, '<br>');
-        feedbackText.innerHTML = formattedFeedback;
-        
+        feedbackText.innerHTML = feedback.replace(/\n/g, '<br>');
         examFeedbackCard.classList.remove('hidden');
     }
-
     function showNextExamQuestion() {
         state.currentExam.index++;
         if (state.currentExam.index >= state.currentExam.questions.length) {
-            examContainer.classList.add('hidden');
-            examCompletionScreen.classList.remove('hidden');
+            examContainer.classList.add('hidden'); examCompletionScreen.classList.remove('hidden');
             examFinalScore.textContent = `Du hast ${state.currentExam.score} von ${state.currentExam.questions.length} Fragen richtig beantwortet.`;
         } else {
             displayExamQuestion();
         }
     }
-    
-    // --- SPEECH RECOGNITION ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-
     function initSpeechRecognition() {
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.lang = 'de-DE';
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-
-            recognition.onresult = (event) => {
-                const speechResult = event.results[0][0].transcript;
-                examAnswerInput.value = speechResult;
-            };
-
-            recognition.onend = () => {
-                micButton.classList.remove('is-listening');
-            };
-
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error', event.error);
-                alert('Fehler bei der Spracherkennung: ' + event.error);
-            };
-
+            recognition.continuous = false; recognition.lang = 'de-DE'; recognition.interimResults = false; recognition.maxAlternatives = 1;
+            recognition.onresult = (event) => { examAnswerInput.value = event.results[0][0].transcript; };
+            recognition.onend = () => { micButton.classList.remove('is-listening'); };
+            recognition.onerror = (event) => { console.error('Speech recognition error', event.error); alert('Fehler bei der Spracherkennung: ' + event.error); };
         } else {
             console.log("Speech Recognition not supported.");
             micButton.style.display = 'none';
         }
     }
-
     function toggleSpeechRecognition() {
         if (!recognition) return;
         if (micButton.classList.contains('is-listening')) {
             recognition.stop();
         } else {
-            try {
-                recognition.start();
-                micButton.classList.add('is-listening');
-            } catch(e) {
-                console.error("Could not start recognition", e);
-            }
+            try { recognition.start(); micButton.classList.add('is-listening'); } catch(e) { console.error("Could not start recognition", e); }
         }
     }
 
