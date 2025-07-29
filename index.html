@@ -24,121 +24,46 @@
                 <button data-target="category-selection-screen"><i class="fas fa-list-ul"></i> Kategorien</button>
                 <button data-target="incorrect-list-screen"><i class="fas fa-redo"></i> Falsch beantwortet</button>
                 <button data-target="exam-screen" id="exam-button"><i class="fas fa-graduation-cap"></i> Prüfung</button>
-                <!-- NEU: Zertifikat Button -->
                 <button data-target="certificate-screen"><i class="fas fa-award"></i> Zertifikat</button>
                 <button data-target="settings-screen"><i class="fas fa-cog"></i> Einstellungen</button>
             </nav>
-            <footer class="global-progress">
-                <!-- Global progress will be injected here -->
-            </footer>
+            <footer class="global-progress"></footer>
         </section>
 
-        <!-- ===== Category Selection Screen ===== -->
-        <section id="category-selection-screen" class="screen">
-            <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
-                <h2>Kategorien</h2>
-            </header>
-            <div id="category-list" class="category-list"></div>
-             <footer class="global-progress"></footer>
-        </section>
+        <!-- ... Alle anderen Sektionen bleiben exakt gleich ... -->
 
-        <!-- ===== Quiz Screen ===== -->
-        <section id="quiz-screen" class="screen">
-            <header class="screen-header">
-                 <button class="back-button" id="quiz-back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i></button>
-                <h2 id="quiz-category-title">Kategorie</h2>
-                <div id="joker-container"></div>
-            </header>
-            <div id="quiz-container">
-                <div id="quiz-progress-bar"><div id="quiz-progress-bar-inner"></div></div>
-                <p id="quiz-counter"></p>
-                <div id="question-card"><p id="question-text"></p></div>
-                <div id="options-container"></div>
-                <div id="explanation-container" class="hidden">
-                    <p id="explanation-text"></p>
-                    <button id="next-question-btn">Nächste Frage</button>
-                </div>
-            </div>
-        </section>
-        
-        <!-- ===== Incorrectly Answered Screen ===== -->
-        <section id="incorrect-list-screen" class="screen">
-            <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
-                <h2>Falsch beantwortete Fragen</h2>
-            </header>
-            <div id="incorrect-questions-list"></div>
-        </section>
-        
-        <!-- ===== Final Exam Screen ===== -->
-        <section id="exam-screen" class="screen">
-             <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
-                <h2>Abschlussprüfung</h2>
-            </header>
-            <div id="exam-container">
-                <p id="exam-counter"></p>
-                <div id="exam-question-card"><p id="exam-question-text"></p></div>
-                <div id="exam-answer-area">
-                    <textarea id="exam-answer-input" placeholder="Tippe oder sprich deine Antwort hier..."></textarea>
-                    <button id="mic-button"><i class="fas fa-microphone"></i></button>
-                </div>
-                <button id="submit-exam-answer-btn">Antwort senden</button>
-                <div id="exam-loading-spinner" class="spinner-container hidden">
-                    <div class="spinner"></div><p>KI wertet deine Antwort aus...</p>
-                </div>
-                <div id="exam-feedback-card" class="hidden">
-                    <h3 id="feedback-title"></h3><p id="feedback-text"></p>
-                    <button id="next-exam-question-btn">Weiter zur nächsten Frage</button>
-                </div>
-            </div>
-            <div id="exam-completion-screen" class="hidden">
-                <h2>Prüfung abgeschlossen!</h2><p id="exam-final-score"></p>
-                <button id="restart-exam-btn">Prüfung neu starten</button>
-            </div>
-        </section>
-        
-        <!-- ===== NEU: Certificate Screen ===== -->
+        <!-- ===== Certificate Screen (mit der entscheidenden Änderung) ===== -->
         <section id="certificate-screen" class="screen">
             <header class="screen-header">
                 <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2>Dein Zertifikat</h2>
             </header>
             <div id="certificate-content">
-                <!-- Ansicht zur Namenseingabe -->
                 <div id="certificate-form">
                     <p>Gib deinen Namen ein, um dein persönliches Zertifikat zu erstellen.</p>
                     <input type="text" id="certificate-name-input" placeholder="Dein Name">
                     <button id="generate-certificate-btn">Zertifikat erstellen</button>
                 </div>
-                <!-- Ansicht während des Ladens -->
                 <div id="certificate-loading" class="spinner-container hidden">
                     <div class="spinner"></div>
                     <p>Dein Zertifikat wird generiert...<br>Dies kann bis zu einer Minute dauern.</p>
                 </div>
-                <!-- Ansicht des fertigen Zertifikats -->
                 <div id="certificate-display" class="hidden">
                     <img id="certificate-image" alt="Dein persönliches Zertifikat">
-                    <a id="download-certificate-btn" class="button-style" download="KI-Master-Zertifikat.png">Herunterladen</a>
+                    <!-- ** DIE ÄNDERUNG: <a> wird zu <button> ** -->
+                    <button id="download-certificate-btn">Herunterladen</button>
                     <button id="regenerate-certificate-btn" class="secondary-btn">Anderen Namen verwenden</button>
                 </div>
             </div>
         </section>
 
-        <!-- ===== Settings Screen ===== -->
-        <section id="settings-screen" class="screen">
-             <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
-                <h2>Einstellungen</h2>
-            </header>
-            <div class="settings-container">
-                <p>Hier kannst du deinen gesamten Fortschritt inklusive Zertifikat zurücksetzen.</p>
-                <button id="reset-progress-btn" class="danger">Fortschritt zurücksetzen</button>
-            </div>
-        </section>
+        <!-- ... Restliche Sektionen bleiben gleich ... -->
+        <section id="category-selection-screen" class="screen"><header class="screen-header"><button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button><h2>Kategorien</h2></header><div id="category-list"></div><footer class="global-progress"></footer></section>
+        <section id="quiz-screen" class="screen"><header class="screen-header"><button class="back-button" id="quiz-back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i></button><h2 id="quiz-category-title"></h2><div id="joker-container"></div></header><div id="quiz-container"><div id="quiz-progress-bar"><div id="quiz-progress-bar-inner"></div></div><p id="quiz-counter"></p><div id="question-card"><p id="question-text"></p></div><div id="options-container"></div><div id="explanation-container" class="hidden"><p id="explanation-text"></p><button id="next-question-btn">Nächste Frage</button></div></div></section>
+        <section id="incorrect-list-screen" class="screen"><header class="screen-header"><button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button><h2>Falsch beantwortete Fragen</h2></header><div id="incorrect-questions-list"></div></section>
+        <section id="exam-screen" class="screen"><header class="screen-header"><button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button><h2>Abschlussprüfung</h2></header><div id="exam-container"><p id="exam-counter"></p><div id="exam-question-card"><p id="exam-question-text"></p></div><div id="exam-answer-area"><textarea id="exam-answer-input" placeholder="Tippe oder sprich deine Antwort hier..."></textarea><button id="mic-button"><i class="fas fa-microphone"></i></button></div><button id="submit-exam-answer-btn">Antwort senden</button><div id="exam-loading-spinner" class="spinner-container hidden"><div class="spinner"></div><p>KI wertet deine Antwort aus...</p></div><div id="exam-feedback-card" class="hidden"><h3 id="feedback-title"></h3><p id="feedback-text"></p><button id="next-exam-question-btn">Weiter zur nächsten Frage</button></div></div><div id="exam-completion-screen" class="hidden"><h2>Prüfung abgeschlossen!</h2><p id="exam-final-score"></p><button id="restart-exam-btn">Prüfung neu starten</button></div></section>
+        <section id="settings-screen" class="screen"><header class="screen-header"><button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button><h2>Einstellungen</h2></header><div class="settings-container"><p>Hier kannst du deinen gesamten Fortschritt inklusive Zertifikat zurücksetzen.</p><button id="reset-progress-btn" class="danger">Fortschritt zurücksetzen</button></div></section>
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>
