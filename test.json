@@ -1,1 +1,42 @@
-
+[
+  {
+    "id": 1,
+    "question": "Was ist der Unterschied zwischen KI (Künstlicher Intelligenz), ML (Maschinellem Lernen) und DL (Deep Learning)?"
+  },
+  {
+    "id": 2,
+    "question": "Was prüft der Turing-Test und warum wird er heute kritisch gesehen?"
+  },
+  {
+    "id": 3,
+    "question": "Was versteht man unter 'Bias' in Trainingsdaten und wie kann er sich auf KI-Ergebnisse auswirken?"
+  },
+  {
+    "id": 4,
+    "question": "Was bedeutet der Begriff 'Halluzination' bei Sprachmodellen wie ChatGPT?"
+  },
+  {
+    "id": 5,
+    "question": "Was ist ein neuronales Netz – vereinfacht erklärt?"
+  },
+  {
+    "id": 6,
+    "question": "Was unterscheidet ein Generatives KI-Modell (wie DALL·E oder ChatGPT) von einem Klassifikationsmodell?"
+  },
+  {
+    "id": 7,
+    "question": "Nenne zwei typische Anwendungsbereiche von KI im Alltag."
+  },
+  {
+    "id": 8,
+    "question": "Was bedeutet 'Überanpassung' (Overfitting) in der KI – und woran erkennt man sie?"
+  },
+  {
+    "id": 9,
+    "question": "Was ist der Zweck von Trainingsdaten bei einem KI-Modell?"
+  },
+  {
+    "id": 10,
+    "question": "Warum ist es problematisch, KI-Modelle mit personenbezogenen Daten zu trainieren, ohne Zustimmung?"
+  }
+]
