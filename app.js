@@ -66,13 +66,18 @@ document.addEventListener('DOMContentLoaded', () => {
     async function init() {
         loadProgress();
         try {
+            // ** DER FIX FÜR GITHUB PAGES **
+            // Der Name deines GitHub-Repositorys muss hier exakt stimmen.
+            const repoName = 'KIMaster'; 
+            
             const [questionsRes, testRes] = await Promise.all([
-                fetch('questions.json'),
-                fetch('test.json')
+                fetch(`/${repoName}/questions.json`),
+                fetch(`/${repoName}/test.json`)
             ]);
-            // Wichtig: Prüfen ob die Antwort erfolgreich war (Status 200)
+
             if (!questionsRes.ok || !testRes.ok) {
-                throw new Error(`HTTP error! Status: ${questionsRes.status}, ${testRes.status}`);
+                // Wenn der Fetch fehlschlägt, gibt diese Zeile den genauen Fehlercode aus
+                throw new Error(`HTTP error! questions: ${questionsRes.status}, test: ${testRes.status}`);
             }
             state.allQuestions = await questionsRes.json();
             state.testQuestions = await testRes.json();
@@ -86,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Fehler beim Laden der Quizdaten:", error);
             app.innerHTML = `<div style="padding: 25px; text-align: center;">
-                <h2 style="color: #dc3545;">Fehler beim Laden</h2>
-                <p style="color: #e0e0e0; margin-top: 10px;">Die Quizdaten (questions.json / test.json) konnten nicht geladen werden. Bitte stelle sicher, dass die Dateien im Hauptverzeichnis deines GitHub-Repositorys liegen und die Dateinamen korrekt sind.</p>
-                <p style="color: #a0a0a0; font-size: 0.8rem; margin-top: 15px;">Öffne die Entwicklerkonsole (F12) für mehr Details.</p>
+                <h2 style="color: #dc3545;">Fehler: Die Quizdaten konnten nicht geladen werden.</h2>
+                <p style="color: #e0e0e0; margin-top: 10px;">Bitte leere den Browser-Cache und lade die Seite neu (Strg+Shift+R).</p>
+                <p style="color: #a0a0a0; font-size: 0.8rem; margin-top: 15px;">Stelle sicher, dass die Dateien im Repo vorhanden sind und der 'repoName' in 'app.js' korrekt ist. Details in der Konsole (F12).</p>
             </div>`;
         }
     }
@@ -195,6 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function useJoker() {
         if (state.progress.jokers <= 0) return;
+        const useJokerBtn = document.getElementById('use-joker-btn');
+        if (useJokerBtn && useJokerBtn.disabled) return;
+
         state.progress.jokers--;
         const question = state.currentQuiz.questions[state.currentQuiz.index];
         const options = Array.from(optionsContainer.children);
@@ -202,7 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
         incorrectOptions.sort(() => Math.random() - 0.5);
         incorrectOptions[0].classList.add('hidden');
         incorrectOptions[1].classList.add('hidden');
-        document.getElementById('use-joker-btn').disabled = true;
+        
+        useJokerBtn.disabled = true;
         updateJokerDisplay();
         saveProgress();
     }
@@ -267,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btn.dataset.option === question.correct) btn.classList.add('correct');
             else if (btn.dataset.option === selectedOption) btn.classList.add('incorrect');
         });
+        document.getElementById('use-joker-btn').disabled = true; // Joker nach Antwort deaktivieren
         const questionId = question.id;
         state.progress.correctlyAnswered = state.progress.correctlyAnswered.filter(id => id !== questionId);
         state.progress.incorrectlyAnswered = state.progress.incorrectlyAnswered.filter(id => id !== questionId);
@@ -292,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayQuestion();
     }
     
-    // --- INCORRECT LIST LOGIC (WIEDERHERGESTELLT) ---
+    // --- INCORRECT LIST LOGIC ---
     function renderIncorrectList() {
         incorrectQuestionsList.innerHTML = '';
         const incorrectQuestions = state.allQuestions.filter(q => state.progress.incorrectlyAnswered.includes(q.id));
@@ -313,15 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (questionToRetry) {
             state.currentQuiz = { questions: [questionToRetry], index: 0, isMasterQuiz: false };
             quizCategoryTitle.textContent = "Frage wiederholen";
-            quizBackButton.dataset.target = "incorrect-list-screen";
+            quizBackButton.dataset.target = "incorrect-list-screen"; // Korrekter Zurück-Pfad
             showScreen('quiz-screen');
             displayQuestion();
         }
     }
 
     // --- EXAM LOGIC ---
-    function startExam() { /* ... unverändert ... */ }
-    function displayExamQuestion() { /* ... unverändert ... */ }
     async function submitExamAnswer() {
         const question = state.currentExam.questions[state.currentExam.index];
         const answer = examAnswerInput.value.trim();
@@ -342,21 +350,11 @@ document.addEventListener('DOMContentLoaded', () => {
             displayExamFeedback(feedback);
         } catch (error) {
             console.error("Fehler bei der Kommunikation mit dem Webhook:", error);
-            displayExamFeedback("Fehler: Die Antwort konnte nicht ausgewertet werden.");
+            displayExamFeedback("Fehler: Die Antwort konnte nicht ausgewertet werden. Prüfe die Browser-Konsole für Details.");
         } finally {
             examLoadingSpinner.classList.add('hidden');
         }
     }
-    function displayExamFeedback(feedback) { /* ... unverändert ... */ }
-    function showNextExamQuestion() { /* ... unverändert ... */ }
-    
-    // --- SPEECH RECOGNITION ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
-    function initSpeechRecognition() { /* ... unverändert ... */ }
-    function toggleSpeechRecognition() { /* ... unverändert ... */ }
-
-    // Unveränderte Funktionen hier zur Vollständigkeit
     function startExam() {
         state.currentExam = { questions: [...state.testQuestions].sort(() => 0.5 - Math.random()), index: 0, score: 0 };
         examContainer.classList.remove('hidden'); examCompletionScreen.classList.add('hidden');
@@ -392,13 +390,17 @@ document.addEventListener('DOMContentLoaded', () => {
             displayExamQuestion();
         }
     }
+
+    // --- SPEECH RECOGNITION ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
     function initSpeechRecognition() {
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.continuous = false; recognition.lang = 'de-DE'; recognition.interimResults = false; recognition.maxAlternatives = 1;
             recognition.onresult = (event) => { examAnswerInput.value = event.results[0][0].transcript; };
             recognition.onend = () => { micButton.classList.remove('is-listening'); };
-            recognition.onerror = (event) => { console.error('Speech recognition error', event.error); alert('Fehler bei der Spracherkennung: ' + event.error); };
+            recognition.onerror = (event) => { console.error('Speech recognition error', event.error); alert('Fehler bei der Spracherkennung: ' + event.error); micButton.classList.remove('is-listening'); };
         } else {
             console.log("Speech Recognition not supported.");
             micButton.style.display = 'none';
@@ -409,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (micButton.classList.contains('is-listening')) {
             recognition.stop();
         } else {
-            try { recognition.start(); micButton.classList.add('is-listening'); } catch(e) { console.error("Could not start recognition", e); }
+            try { recognition.start(); micButton.classList.add('is-listening'); } catch(e) { console.error("Could not start recognition", e); micButton.classList.remove('is-listening');}
         }
     }
 
