@@ -22,26 +22,32 @@
             <nav class="main-menu">
                 <button data-target="category-selection-screen"><i class="fas fa-list-ul"></i> Kategorien</button>
                 <button data-target="incorrect-list-screen"><i class="fas fa-redo"></i> Falsch beantwortet</button>
-                <button data-target="exam-screen" id="exam-button" disabled><i class="fas fa-graduation-cap"></i> Prüfung</button>
+                <button data-target="exam-screen" id="exam-button"><i class="fas fa-graduation-cap"></i> Prüfung</button>
                 <button data-target="settings-screen"><i class="fas fa-cog"></i> Einstellungen</button>
             </nav>
+            <footer class="global-progress">
+                <!-- Global progress will be injected here -->
+            </footer>
         </section>
 
         <!-- ===== Category Selection Screen ===== -->
         <section id="category-selection-screen" class="screen">
             <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2>Kategorien</h2>
             </header>
             <div id="category-list" class="category-list">
-                <!-- Categories will be injected here by JS -->
+                <!-- Categories will be injected here -->
             </div>
+             <footer class="global-progress">
+                <!-- Global progress will be injected here -->
+            </footer>
         </section>
 
         <!-- ===== Quiz Screen ===== -->
         <section id="quiz-screen" class="screen">
             <header class="screen-header">
-                 <button class="back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                 <button class="back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2 id="quiz-category-title">Kategorie</h2>
             </header>
             <div id="quiz-container">
@@ -53,7 +59,7 @@
                     <p id="question-text">Hier steht die Frage...</p>
                 </div>
                 <div id="options-container" class="options-container">
-                    <!-- Options will be injected here by JS -->
+                    <!-- Options will be injected here -->
                 </div>
                 <div id="explanation-container" class="hidden">
                     <p id="explanation-text"></p>
@@ -65,18 +71,18 @@
         <!-- ===== Incorrectly Answered Screen ===== -->
         <section id="incorrect-list-screen" class="screen">
             <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2>Falsch beantwortete Fragen</h2>
             </header>
             <div id="incorrect-questions-list">
-                <!-- Incorrect questions will be injected here by JS -->
+                <!-- Incorrect questions will be injected here -->
             </div>
         </section>
         
         <!-- ===== Final Exam Screen ===== -->
         <section id="exam-screen" class="screen">
              <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2>Abschlussprüfung</h2>
             </header>
             <div id="exam-container">
@@ -103,7 +109,7 @@
             </div>
             <div id="exam-completion-screen" class="hidden">
                 <h2>Prüfung abgeschlossen!</h2>
-                <p>Großartige Leistung. Du hast dein Wissen unter Beweis gestellt.</p>
+                <p id="exam-final-score"></p>
                 <button id="restart-exam-btn">Prüfung neu starten</button>
             </div>
         </section>
@@ -111,7 +117,7 @@
         <!-- ===== Settings Screen ===== -->
         <section id="settings-screen" class="screen">
              <header class="screen-header">
-                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i></button>
                 <h2>Einstellungen</h2>
             </header>
             <div class="settings-container">
