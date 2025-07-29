@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI Quiz-App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Titillium+Web:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
+    <div id="app">
+        <!-- ===== Start Screen ===== -->
+        <section id="start-screen" class="screen active">
+            <header>
+                <h1>KI Quiz</h1>
+                <p>Teste dein Wissen über Künstliche Intelligenz</p>
+            </header>
+            <nav class="main-menu">
+                <button data-target="category-selection-screen"><i class="fas fa-list-ul"></i> Kategorien</button>
+                <button data-target="incorrect-list-screen"><i class="fas fa-redo"></i> Falsch beantwortet</button>
+                <button data-target="exam-screen" id="exam-button" disabled><i class="fas fa-graduation-cap"></i> Prüfung</button>
+                <button data-target="settings-screen"><i class="fas fa-cog"></i> Einstellungen</button>
+            </nav>
+        </section>
+
+        <!-- ===== Category Selection Screen ===== -->
+        <section id="category-selection-screen" class="screen">
+            <header class="screen-header">
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <h2>Kategorien</h2>
+            </header>
+            <div id="category-list" class="category-list">
+                <!-- Categories will be injected here by JS -->
+            </div>
+        </section>
+
+        <!-- ===== Quiz Screen ===== -->
+        <section id="quiz-screen" class="screen">
+            <header class="screen-header">
+                 <button class="back-button" data-target="category-selection-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <h2 id="quiz-category-title">Kategorie</h2>
+            </header>
+            <div id="quiz-container">
+                <div id="quiz-progress-bar">
+                    <div id="quiz-progress-bar-inner"></div>
+                </div>
+                <p id="quiz-counter">Frage 1 / 10</p>
+                <div id="question-card">
+                    <p id="question-text">Hier steht die Frage...</p>
+                </div>
+                <div id="options-container" class="options-container">
+                    <!-- Options will be injected here by JS -->
+                </div>
+                <div id="explanation-container" class="hidden">
+                    <p id="explanation-text"></p>
+                    <button id="next-question-btn">Nächste Frage</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ===== Incorrectly Answered Screen ===== -->
+        <section id="incorrect-list-screen" class="screen">
+            <header class="screen-header">
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <h2>Falsch beantwortete Fragen</h2>
+            </header>
+            <div id="incorrect-questions-list">
+                <!-- Incorrect questions will be injected here by JS -->
+            </div>
+        </section>
+        
+        <!-- ===== Final Exam Screen ===== -->
+        <section id="exam-screen" class="screen">
+             <header class="screen-header">
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <h2>Abschlussprüfung</h2>
+            </header>
+            <div id="exam-container">
+                <p id="exam-counter">Frage 1 / 10</p>
+                <div id="exam-question-card">
+                    <p id="exam-question-text"></p>
+                </div>
+                <div id="exam-answer-area">
+                    <textarea id="exam-answer-input" placeholder="Tippe oder sprich deine Antwort hier..."></textarea>
+                    <button id="mic-button"><i class="fas fa-microphone"></i></button>
+                </div>
+                <button id="submit-exam-answer-btn">Antwort senden</button>
+                
+                <div id="exam-loading-spinner" class="spinner-container hidden">
+                    <div class="spinner"></div>
+                    <p>KI wertet deine Antwort aus...</p>
+                </div>
+                
+                <div id="exam-feedback-card" class="hidden">
+                    <h3 id="feedback-title"></h3>
+                    <p id="feedback-text"></p>
+                    <button id="next-exam-question-btn">Weiter zur nächsten Frage</button>
+                </div>
+            </div>
+            <div id="exam-completion-screen" class="hidden">
+                <h2>Prüfung abgeschlossen!</h2>
+                <p>Großartige Leistung. Du hast dein Wissen unter Beweis gestellt.</p>
+                <button id="restart-exam-btn">Prüfung neu starten</button>
+            </div>
+        </section>
+        
+        <!-- ===== Settings Screen ===== -->
+        <section id="settings-screen" class="screen">
+             <header class="screen-header">
+                <button class="back-button" data-target="start-screen"><i class="fas fa-arrow-left"></i> Zurück</button>
+                <h2>Einstellungen</h2>
+            </header>
+            <div class="settings-container">
+                <p>Hier kannst du deinen gesamten Fortschritt zurücksetzen.</p>
+                <button id="reset-progress-btn" class="danger">Fortschritt zurücksetzen</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
